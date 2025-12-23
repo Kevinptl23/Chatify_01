@@ -1,5 +1,8 @@
 # Environment variables
 server/config/config.env
+config/config.env
+config
+config/
 
 # Logs
 node_modules/
