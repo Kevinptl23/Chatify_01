@@ -12,7 +12,9 @@ cloudinary.config({
 const server = http.createServer(app);
 initSocket(server);
 
+const PORT = process.env.PORT || 5000;
 
-server.listen(process.env.PORT, (req, res) => {
-    console.log(`Server is listening on port ${process.env.PORT} in ${process.env.NODE_ENV} mode`);
+
+server.listen(PORT, (req, res) => {
+    console.log(`Server is listening on port ${PORT} in ${process.env.NODE_ENV} mode`);
 })
