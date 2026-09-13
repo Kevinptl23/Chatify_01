@@ -21,11 +21,11 @@ export const getMessages = createAsyncThunk(
   async (userId, thunkAPI) => {
     try {
       const res = await axiosInstance.get(`/message/${userId}`);
-      console.log(res.data)
       return res.data;
     } catch (error) {
-      toast.error(error.response.data.message);
-      return thunkAPI.rejectWithValue(error.response.data.message);
+      const errorMsg = error.response?.data?.message || "Failed to fetch messages";
+      toast.error(errorMsg);
+      return thunkAPI.rejectWithValue(errorMsg);
     }
   }
 );
@@ -39,11 +39,11 @@ export const sendMessage = createAsyncThunk(
         `/message/send/${chat.selectedUser._id}`,
         messageData
       );
-      console.log(res.data.newMessage);
       return res.data.newMessage;
     } catch (error) {
-      toast.error(error.response.data.message);
-      return thunkAPI.rejectWithValue(error.response.data.message);
+      const errorMsg = error.response?.data?.message || "Failed to send message";
+      toast.error(errorMsg);
+      return thunkAPI.rejectWithValue(errorMsg);
     }
   }
 );
@@ -51,7 +51,7 @@ export const sendMessage = createAsyncThunk(
 const chatSlice = createSlice({
   name: "chat",
   initialState: {
-    messages: ["Hii how can i help you?"],
+    messages: [],
     users: [],
     selectedUser: null,
     isUsersLoading: false,
@@ -62,7 +62,10 @@ const chatSlice = createSlice({
       state.selectedUser = action.payload;
     },
     pushNewMessage: (state, action) => {
-      state.messages.push(action.payload);
+      const exists = state.messages.some((m) => m._id === action.payload._id);
+      if (!exists) {
+        state.messages.push(action.payload);
+      }
     },
   },
   extraReducers: (builder) => {
@@ -81,16 +84,18 @@ const chatSlice = createSlice({
         state.isMessagesLoading = true;
       })
       .addCase(getMessages.fulfilled, (state, action) => {
-        state.messages = action.payload.message;
+        state.messages = action.payload.message || [];
         state.isMessagesLoading = false;
       })
       .addCase(getMessages.rejected, (state) => {
         state.isMessagesLoading = false;
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
+        const exists = state.messages.some((m) => m._id === action.payload._id);
+        if (!exists) {
           state.messages.push(action.payload);
-      })
-      
+        }
+      });
   },
 });
 

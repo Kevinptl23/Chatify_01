@@ -1,7 +1,8 @@
+import fs from 'fs';
 import { catchAsyncError } from "../middleware/catchAsyncError.middleware.js";
 import User from "../models/user.model.js";
 import Message from '../models/message.model.js';
-import {v2 as cloudinary} from 'cloudinary'
+import {v2 as cloudinary} from 'cloudinary';
 import { getReceiverSocketId } from "../utils/socket.js";
 import { io } from "../utils/socket.js";
 
@@ -69,19 +70,25 @@ export const sendMessage = catchAsyncError(async (req, res, next) => {
         try {
             const uploadResponse = await cloudinary.uploader.upload(media.tempFilePath, {
                 folder: "chatApp_Media",
+                resource_type: "auto",
                 transformation: [
-                    {width: 300, height: 300, crop: "limit"},
+                    {width: 1200, crop: "limit"},
                     {quality: "auto"},
                     {fetch_format: "auto"}
                 ]
-            })
+            });
 
             mediaUrl = uploadResponse?.secure_url;
         } catch (error) {
+            console.error("Cloudinary media upload error: ", error);
             return res.status(500).json({
                 success: false,
-                message: "Failed to upload media. Please try agan later."
-            })
+                message: "Failed to upload media. Please try again later."
+            });
+        } finally {
+            if(media?.tempFilePath && fs.existsSync(media.tempFilePath)){
+                fs.unlinkSync(media.tempFilePath);
+            }
         }
     }
 

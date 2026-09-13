@@ -2,7 +2,8 @@ import {catchAsyncError} from '../middleware/catchAsyncError.middleware.js';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs'
 import { generateToken } from '../utils/jwtToken.js';
-import {v2 as clodinary} from 'cloudinary'
+import fs from 'fs';
+import {v2 as cloudinary} from 'cloudinary';
 
 export const signup = catchAsyncError( async (req, res, next) => {
     const {fullName, email, password} = req.body;
@@ -91,15 +92,16 @@ export const signin = catchAsyncError(async (req, res, next) => {
     }
 
     generateToken(user, "User logged in successfully", 200, res);
-
 });
 
 export const signout = catchAsyncError(async (req, res, next) => {
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.status(200).cookie("token", "", {
         maxAge: 0,
         httpOnly: true,
-        sameSite: "strict",
-        secure: process.env.NODE_ENV !== "development" ? true : false 
+        sameSite: isProduction ? "none" : "lax",
+        secure: isProduction
     }).json({
         success: true,
         message: "User Logged-out successfully."
@@ -130,23 +132,27 @@ export const updateProfile = catchAsyncError(async (req, res, next) => {
         try {
             const oldAvtarPublicID = req?.user?.avatar?.public_id;
             if(oldAvtarPublicID && oldAvtarPublicID.length > 0){
-                await clodinary.uploader.destroy(oldAvtarPublicID);
+                await cloudinary.uploader.destroy(oldAvtarPublicID);
             }
 
-            clodinaryResponse = await clodinary.uploader.upload(avatar.tempFilePath, {
+            clodinaryResponse = await cloudinary.uploader.upload(avatar.tempFilePath, {
                 folder: "chatApp",
                 transformation: [
                     {width: 300, height: 300, crop: "limit"},
                     {quality: "auto"},
                     {fetch_format: "auto"}
                 ]
-            })
+            });
         } catch (error) {
-            console.error("clodinary upload error: ", error);
+            console.error("Cloudinary upload error: ", error);
             return res.status(500).json({
                 success: false,
-                message: "Failed to upload avatar. Please try agan later."
-            })
+                message: "Failed to upload avatar. Please try again later."
+            });
+        } finally {
+            if(avatar?.tempFilePath && fs.existsSync(avatar.tempFilePath)){
+                fs.unlinkSync(avatar.tempFilePath);
+            }
         }
     }
 

@@ -12,7 +12,7 @@ const Sidebar = () => {
     (state) => state.chat
   );
 
-  const { onlineUsers } = useSelector((state) => state.auth);
+  const { onlineUsers, authUser } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
 
@@ -21,6 +21,7 @@ const Sidebar = () => {
   }, [dispatch]);
 
   const filteredUsers = showOnlineOnly ? users?.filter((user) => onlineUsers.includes(user._id)) : users;
+  const onlineCount = Math.max(0, onlineUsers.filter((id) => id !== authUser?._id).length);
 
 
   if (isUsersLoading) {
@@ -49,7 +50,7 @@ const Sidebar = () => {
           </label>
 
           <span className="text-xs text-zinc-500">
-            ({onlineUsers.length - 1} online)
+            ({onlineCount} online)
           </span>
         </div>
       </div>

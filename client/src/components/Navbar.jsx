@@ -4,14 +4,20 @@ import { Link } from "react-router-dom";
 import { logout } from "../store/slices/authSlice.js";
 
 
+import { useLocation } from "react-router-dom";
+
 const Navbar = () => {
   const { authUser } = useSelector((state) => state.auth);
-
+  const location = useLocation();
   const dispatch = useDispatch();
 
   const handleLogout = () => {
     dispatch(logout());
   };
+
+  if (location.pathname === "/login" || location.pathname === "/register") {
+    return null;
+  }
 
   return (
     <>
@@ -24,10 +30,10 @@ const Navbar = () => {
                 to={"/"}
                 className="flex items-center gap-2.5 hover:opacity-80 transition"
               >
-                <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <MessageCircle className="w-6 h-6 text-blue-600" />
+                <div className="w-9 h-9 rounded-xl bg-[#25D366] shadow-sm shadow-[#25D366]/40 flex items-center justify-center">
+                  <MessageCircle className="w-5 h-5 text-white fill-white" />
                 </div>
-                <h1 className="text-lg font-bold text-gray-800">Chatify</h1>
+                <h1 className="text-lg font-bold text-gray-900 tracking-tight">Chatify</h1>
               </Link>
             </div>
 

@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useRef } from "react";
-import { getMessages } from "../store/slices/chatSlice";
+import { getMessages, pushNewMessage } from "../store/slices/chatSlice";
 import { getSocket } from "../lib/socket.js";
 import MessageInput from "./MessageInput.jsx";
 import MessageSkeleton from "./skeletons/MessageSkeleton.jsx";
@@ -18,16 +18,13 @@ const ChatContainer = () => {
   const messageEndRef = useRef(null);
 
   useEffect(() => {
-    dispatch(getMessages(selectedUser._id));
-  }, [selectedUser._id]);
-
-  useEffect(() => {
     if (messageEndRef.current && messages) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
   function formatMessageTime(date) {
+    if (!date) return "";
     return new Date(date).toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
@@ -41,9 +38,20 @@ const ChatContainer = () => {
     dispatch(getMessages(selectedUser._id));
 
     const socket = getSocket();
-
     if (!socket) return;
-  }, [selectedUser?._id]);
+
+    const handleNewMessage = (newMessage) => {
+      if (
+        newMessage.senderId === selectedUser._id ||
+        newMessage.receiverId === selectedUser._id
+      ) {
+        dispatch(pushNewMessage(newMessage));
+      }
+    };
+
+    socket.on("newMessage", handleNewMessage);
+    return () => socket.off("newMessage", handleNewMessage);
+  }, [selectedUser?._id, dispatch]);
 
   if (isMessagesLoading) {
     return (

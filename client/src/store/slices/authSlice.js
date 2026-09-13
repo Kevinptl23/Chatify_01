@@ -22,8 +22,9 @@ export const logout = createAsyncThunk("user/sign-out", async (_, thunkAPI) => {
     disconnectSocket();
     return null;
   } catch (error) {
-    toast.error(error.response.data.message);
-    return thunkAPI.rejectWithValue(error.response.data.message);
+    const errorMsg = error.response?.data?.message || "Failed to logout";
+    toast.error(errorMsg);
+    return thunkAPI.rejectWithValue(errorMsg);
   }
 });
 
@@ -32,17 +33,16 @@ export const login = createAsyncThunk(
   async (data, thunkAPI) => {
     try {
       const res = await axiosInstance.post("/user/sign-in", data);
-      connectSocket(res.data);
+      if (res.data?.user?._id) {
+        connectSocket(res.data.user._id);
+      }
       toast.success("Logged in successfully");
-      return res.data;
+      return res.data.user;
     } catch (error) {
       console.log(error);
-      toast.error(
-        error.response?.data?.message || error.message || "Login failed"
-      );
-      return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Login failed"
-      );
+      const errorMsg = error.response?.data?.message || error.message || "Login failed";
+      toast.error(errorMsg);
+      return thunkAPI.rejectWithValue(errorMsg);
     }
   }
 );
@@ -52,12 +52,15 @@ export const signup = createAsyncThunk(
   async (data, thunkAPI) => {
     try {
       const res = await axiosInstance.post("/user/sign-up", data);
-      connectSocket(res.data);
+      if (res.data?.user?._id) {
+        connectSocket(res.data.user._id);
+      }
       toast.success("Account created successfully");
-      return res.data;
+      return res.data.user;
     } catch (error) {
-      toast.error(error.response.data.message);
-      return thunkAPI.rejectWithValue(error.response.data.message);
+      const errorMsg = error.response?.data?.message || error.message || "Signup failed";
+      toast.error(errorMsg);
+      return thunkAPI.rejectWithValue(errorMsg);
     }
   }
 );
@@ -68,10 +71,11 @@ export const updateProfile = createAsyncThunk(
     try {
       const res = await axiosInstance.put("/user/update-profile", data);
       toast.success("Profile updated successfully");
-      return res.data;
+      return res.data.user || res.data;
     } catch (error) {
-      toast.error(error.response.data.message);
-      return thunkAPI.rejectWithValue(error.response.data);
+      const errorMsg = error.response?.data?.message || "Update profile failed";
+      toast.error(errorMsg);
+      return thunkAPI.rejectWithValue(errorMsg);
     }
   }
 );

@@ -4,13 +4,12 @@ import {
   Loader2,
   Lock,
   Mail,
-  MessageSquare,
+  MessageCircle,
   User,
 } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import AuthImagePattern from '../components/AuthImagePattern.jsx';
 import { signup } from "../store/slices/authSlice.js";
 
 const Register = () => {
@@ -28,141 +27,139 @@ const Register = () => {
     e.preventDefault();
     dispatch(signup(formData));
   };
+
   return (
-    <>
-      <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white">
-        {/* LEFT SIDE - FORM */}
-        <div className="flex flex-col justify-center items-center px-6 py-12">
-          <div className="w-full max-w-md">
-            {/* LOGO & HEADING */}
-            <div className="flex flex-col items-center text-center mb-10">
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <MessageSquare className="text-blue-600 w-6 h-6" />
-              </div>
-              <h1 className="text-2xl font-bold mt-4">Welcome Back</h1>
-              <p className="text-gray-500 text-sm mt-2">
-                Sign Up to your account
-              </p>
-            </div>
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white font-sans antialiased px-4 py-12 relative overflow-hidden">
+      {/* Background ambient glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30rem] h-[30rem] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-            {/* LOGIN FORM */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  FullName
-                </label>
+      {/* CENTERED SIGNUP CARD */}
+      <div className="w-full max-w-md bg-slate-900/90 backdrop-blur-2xl border border-slate-800/80 rounded-3xl p-8 shadow-2xl shadow-emerald-950/40 space-y-6 relative z-10">
+        
+        {/* WHATSAPP STYLE LOGO & HEADING */}
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#25D366] shadow-xl shadow-[#25D366]/30 ring-4 ring-[#25D366]/20 mb-1 transition-transform hover:scale-105">
+            <MessageCircle className="w-9 h-9 text-white fill-white" />
+          </div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-white">
+            Create Your Account
+          </h1>
+          <p className="text-slate-400 text-sm">
+            Get started with Chatify for free
+          </p>
+        </div>
 
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <User className="w-5 h-5" />
-                  </span>
-                  <input
-                    type="text"
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={formData.fullName}
-                    placeholder="Enter your fullName"
-                    onChange={(e) =>
-                      setFormData({ ...formData, fullName: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <Mail className="w-5 h-5" />
-                  </span>
-                  <input
-                    type="email"
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={formData.email}
-                    placeholder="you@gmail.com"
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <Lock className="w-5 h-5" />
-                  </span>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={formData.password}
-                    placeholder="********"
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  >
-                    {showPassword ? (
-                      <EyeOff
-                        className="w-5 h-5"
-                        onClick={() => setShowPassword(false)}
-                      />
-                    ) : (
-                      <Eye
-                        className="w-5 h-5"
-                        onClick={() => setShowPassword(true)}
-                      />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={isSigningUp}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition duration-200 flex justify-center items-center gap-2"
-              >
-                {isSigningUp ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Signing Up...
-                  </>
-                ) : (
-                  "Sign up"
-                )}
-              </button>
-            </form>
-
-            {/* Fotter */}
-            <div className="mt-6 text-center">
-              <p className="text-gray-600 text-sm">
-                Already have an account?{" "}
-                <Link to="/login" className="text-blue-600 hover:underline">
-                  Sign In
-                </Link>
-              </p>
+        {/* REGISTER FORM */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          
+          {/* Full Name Field */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Full Name
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <User className="w-5 h-5" />
+              </span>
+              <input
+                type="text"
+                required
+                className="w-full pl-11 pr-4 py-3 bg-slate-950/80 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition duration-200 text-sm"
+                value={formData.fullName}
+                placeholder="John Doe"
+                onChange={(e) =>
+                  setFormData({ ...formData, fullName: e.target.value })
+                }
+              />
             </div>
           </div>
+
+          {/* Email Field */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Email Address
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <Mail className="w-5 h-5" />
+              </span>
+              <input
+                type="email"
+                required
+                className="w-full pl-11 pr-4 py-3 bg-slate-950/80 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition duration-200 text-sm"
+                value={formData.email}
+                placeholder="you@example.com"
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+              />
+            </div>
+          </div>
+
+          {/* Password Field */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Password
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <Lock className="w-5 h-5" />
+              </span>
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                className="w-full pl-11 pr-11 py-3 bg-slate-950/80 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition duration-200 text-sm"
+                value={formData.password}
+                placeholder="•••••••• (Min 8 chars)"
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isSigningUp}
+            className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-bold py-3 px-4 rounded-xl transition duration-200 shadow-lg shadow-[#25D366]/20 flex justify-center items-center gap-2 text-sm disabled:opacity-50 mt-2"
+          >
+            {isSigningUp ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Creating account...
+              </>
+            ) : (
+              "Create Account"
+            )}
+          </button>
+        </form>
+
+        {/* Footer Link */}
+        <div className="text-center pt-2 border-t border-slate-800/80">
+          <p className="text-slate-400 text-sm">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="font-semibold text-[#25D366] hover:underline transition"
+            >
+              Sign In
+            </Link>
+          </p>
         </div>
-        {/* RIGHT SIDE - FORM */}
-        <AuthImagePattern
-          title={"join our community!"}
-          subtitle={
-            "Connect with friends and family share your thought, and stay in touch with your loved ones."
-          }
-        />
       </div>
-    </>
+    </div>
   );
 };
 

@@ -9,9 +9,7 @@ import messageRouter from './routes/message.routes.js'
 
 const app = express();
 
-config({
-    path: './config/config.env'
-});
+config();
 
 app.use(cors({
     origin: [process.env.FRONTEND_URL],
@@ -25,11 +23,24 @@ app.use(express.urlencoded({extended: true}));
 
 app.use(fileUpload({
     useTempFiles: true,
-    tempFileDir: './temp/'
-}))
+    tempFileDir: './temp/',
+    createParentPath: true
+}));
 
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/message', messageRouter);
+
+// Global Error Handling Middleware
+app.use((err, req, res, next) => {
+    err.statusCode = err.statusCode || 500;
+    err.message = err.message || "Internal Server Error";
+
+    return res.status(err.statusCode).json({
+        success: false,
+        message: err.message
+    });
+});
+
 dbConnection();
 
 export default app;
